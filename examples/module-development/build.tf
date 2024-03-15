@@ -15,5 +15,5 @@ module "dev" {
   location = module.rg.rg_location
   tags     = module.rg.rg_tags
 
-  name = "${var.name}-${random_string.entropy.result}"
+  name = "natgw-${var.name}-${random_string.entropy.result}"
 }
