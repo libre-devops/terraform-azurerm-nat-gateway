@@ -4,7 +4,7 @@ resource "azurerm_nat_gateway" "nat_gw" {
   location                = var.location
   resource_group_name     = var.rg_name
   sku_name                = var.nat_gw_sku
-  idle_timeout_in_minutes = var.rg_name
+  idle_timeout_in_minutes = var.nat_gw_idle_timeout_in_minutes
   zones                   = var.nat_gw_zones
   tags                    = var.tags
 }
