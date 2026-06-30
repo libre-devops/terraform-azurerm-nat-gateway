@@ -1,73 +1,76 @@
-variable "associate_nat_gw_to_pip" {
-  type        = bool
-  description = "Whether the module should attempt to add the NAT Gw to a public ip"
-  default     = false
-}
+variable "idle_timeout_in_minutes" {
+  description = "TCP idle timeout in minutes (4 to 120)."
+  type        = number
+  default     = 4
 
-variable "associate_nat_gw_to_pip_prefix" {
-  type        = bool
-  description = "Whether the module should attempt to add the NAT Gw to a public ip prefix"
-  default     = false
-}
-
-variable "associate_nat_gw_to_subnet" {
-  type        = bool
-  description = "Whether the module should attempt to add the NAT Gw to a subnet"
-  default     = false
+  validation {
+    condition     = var.idle_timeout_in_minutes >= 4 && var.idle_timeout_in_minutes <= 120
+    error_message = "idle_timeout_in_minutes must be between 4 and 120."
+  }
 }
 
 variable "location" {
-  description = "The location for this resource to be put in"
+  description = "Azure region for the NAT gateway."
   type        = string
 }
 
 variable "name" {
+  description = "Name of the NAT gateway."
   type        = string
-  description = "The name of the VNet gateway"
 }
 
-variable "nat_gw_idle_timeout_in_minutes" {
-  type        = number
-  description = "The number of idle timeout in minutes for the gateway"
-  default     = 10
+variable "public_ip_associations" {
+  description = "Public IPs to attach for outbound, keyed by a logical name with the public IP id as the value (ids may be computed in the same apply; the static keys keep for_each valid). A NAT gateway needs at least one public IP or prefix."
+  type        = map(string)
+  default     = {}
 }
 
-variable "nat_gw_sku" {
+variable "public_ip_prefix_associations" {
+  description = "Public IP prefixes to attach for outbound, keyed by a logical name with the prefix id as the value."
+  type        = map(string)
+  default     = {}
+}
+
+variable "resource_group_id" {
+  description = "Resource id of the resource group to create the NAT gateway in. The name and subscription are parsed from it (pass the rg module's ids output)."
   type        = string
-  description = "The SKU of the nat gateway"
+
+  validation {
+    condition     = try(provider::azurerm::parse_resource_id(var.resource_group_id).resource_type, "") == "resourceGroups"
+    error_message = "resource_group_id must be a resource group id of the form /subscriptions/<sub>/resourceGroups/<name>."
+  }
+}
+
+variable "sku_name" {
+  description = "NAT gateway SKU. Standard or StandardV2."
+  type        = string
   default     = "Standard"
+
+  validation {
+    condition     = contains(["Standard", "StandardV2"], var.sku_name)
+    error_message = "sku_name must be Standard or StandardV2."
+  }
 }
 
-variable "nat_gw_zones" {
-  type        = list(string)
-  description = "The zones for the natgw"
-  default     = ["1"]
-}
-
-variable "pip_id" {
-  type        = string
-  description = "The id of a pip, if it is to be associated to the nat gateway"
-  default     = null
-}
-
-variable "pip_prefix_id" {
-  type        = string
-  description = "The id of a pip prefix, if it is to be associated to the nat gateway"
-  default     = null
-}
-
-variable "rg_name" {
-  description = "The name of the resource group, this module does not create a resource group, it is expecting the value of a resource group already exists"
-  type        = string
-}
-
-variable "subnet_id" {
-  type        = string
-  description = "A subnet ID to associate the NAT gateway to"
-  default     = null
+variable "subnet_associations" {
+  description = "Subnets to attach this NAT gateway to, keyed by subnet name with the subnet id as the value."
+  type        = map(string)
+  default     = {}
 }
 
 variable "tags" {
+  description = "Tags to apply to the NAT gateway."
   type        = map(string)
-  description = "A map of the tags to use on the resources that are deployed with this module."
+  default     = {}
+}
+
+variable "zones" {
+  description = "Availability zones for the NAT gateway. Standard supports at most one zone; StandardV2 must omit zones (it is zone-redundant by default)."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = var.sku_name == "StandardV2" ? length(var.zones) == 0 : length(var.zones) <= 1
+    error_message = "StandardV2 NAT gateways must omit zones; Standard supports at most one zone."
+  }
 }
