@@ -59,8 +59,9 @@ module "public_ip" {
   location          = local.location
   tags              = module.tags.tags
 
-  public_ips         = { (local.pip_name) = {} }
-  public_ip_prefixes = { (local.prefix_name) = { prefix_length = 30 } }
+  # Zonal IP and prefix so they match the zone-1 NAT gateway below.
+  public_ips         = { (local.pip_name) = { zones = ["1"] } }
+  public_ip_prefixes = { (local.prefix_name) = { prefix_length = 30, zones = ["1"] } }
 }
 
 module "network" {
@@ -72,7 +73,7 @@ module "network" {
   tags              = module.tags.tags
 
   vnet_name     = local.vnet_name
-  address_space = ["10.60.0.0/24"]
+  address_space = ["10.60.0.0/16"]
   subnets = {
     (local.subnet_app)  = { address_prefixes = ["10.60.1.0/24"] }
     (local.subnet_data) = { address_prefixes = ["10.60.2.0/24"] }

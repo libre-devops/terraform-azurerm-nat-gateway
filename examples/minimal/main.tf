@@ -43,7 +43,7 @@ module "network" {
   tags              = module.tags.tags
 
   vnet_name     = local.vnet_name
-  address_space = ["10.0.0.0/24"]
+  address_space = ["10.0.0.0/16"]
   subnets       = { (local.subnet_name) = { address_prefixes = ["10.0.1.0/24"] } }
 }
 
