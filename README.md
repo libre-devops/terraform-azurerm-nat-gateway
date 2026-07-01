@@ -153,4 +153,5 @@ No modules.
 | <a name="output_resource_guid"></a> [resource\_guid](#output\_resource\_guid) | The resource GUID of the NAT gateway. |
 | <a name="output_subnet_association_ids"></a> [subnet\_association\_ids](#output\_subnet\_association\_ids) | Map of subnet name to subnet NAT gateway association id. |
 | <a name="output_subscription_id"></a> [subscription\_id](#output\_subscription\_id) | Subscription id parsed from resource\_group\_id. |
+| <a name="output_tags"></a> [tags](#output\_tags) | The tags applied to the NAT gateway. |
 <!-- END_TF_DOCS -->
