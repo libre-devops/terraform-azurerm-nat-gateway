@@ -29,7 +29,7 @@ locals {
   rg_name     = "rg-${var.short}-${var.loc}-${terraform.workspace}-001"
   vnet_name   = "vnet-${var.short}-${var.loc}-${terraform.workspace}-001"
   pip_name    = "pip-${var.short}-${var.loc}-${terraform.workspace}-001"
-  subnet_name = "snet-app-${var.short}-${var.loc}-${terraform.workspace}-001"
+  subnet_name = "snet-app-${local.vnet_name}"
 }
 
 module "tags" {

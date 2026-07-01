@@ -30,8 +30,8 @@ locals {
   vnet_name   = "vnet-${var.short}-${var.loc}-${terraform.workspace}-001"
   pip_name    = "pip-${var.short}-${var.loc}-${terraform.workspace}-001"
   prefix_name = "ippre-${var.short}-${var.loc}-${terraform.workspace}-001"
-  subnet_app  = "snet-app-${var.short}-${var.loc}-${terraform.workspace}-001"
-  subnet_data = "snet-data-${var.short}-${var.loc}-${terraform.workspace}-001"
+  subnet_app  = "snet-app-${local.vnet_name}"
+  subnet_data = "snet-data-${local.vnet_name}"
 }
 
 module "tags" {
@@ -88,8 +88,9 @@ module "nat_gateway" {
   location          = local.location
   tags              = module.tags.tags
 
-  name  = "ng-${var.short}-${var.loc}-${terraform.workspace}-001"
-  zones = ["1"]
+  name                    = "ng-${var.short}-${var.loc}-${terraform.workspace}-001"
+  zones                   = ["1"]
+  idle_timeout_in_minutes = 10
 
   public_ip_associations        = { (local.pip_name) = module.public_ip.public_ip_ids[local.pip_name] }
   public_ip_prefix_associations = { (local.prefix_name) = module.public_ip.public_ip_prefix_ids[local.prefix_name] }
